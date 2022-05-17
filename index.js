@@ -21,8 +21,10 @@ const persons = [
 		name   : 'itza',
 		street : 'av. challenge',
 		city   : 'Ibiza',
+		phone  : '15-40356728',
 		id     : '3d594671-3436-11e9-bc57-8b80ba54c431'
-	}
+	},
+	{ name: 'Ana', street: 'av. challenge', city: 'Navarra', id: '3d594771-3436-11e9-bc57-8b80ba54c431' }
 ];
 
 const typeDefs = gql`
@@ -50,16 +52,24 @@ const typeDefs = gql`
 	}
 
 	type Mutation {
-		addPerson(name: String!, phone: String, street: String!, city: String!): Person
-		editNumber(name: String!, phone: String!): Person
+		addPerson(
+			name: String!
+			phone: String
+			street: String!
+			city: String!
+		): Person
+		editNumber(
+			name: String!
+			 phone: String!
+		): Person
 	}
 `;
 const resolvers = {
 	Query    : {
 		personCount : () => persons.length,
 		allPersons  : async (root, args) => {
-			const { data: personsFromRestApi } = await axios.get('http://localhost:3000/persons/');
-			if (!args.phone) return personsFromRestApi;
+			// const { data: personsFromRestApi } = await axios.get('http://localhost:3000/persons/');
+			if (!args.phone) return persons;
 
 			// return persons.filter(person => {
 			// 	args.phone === 'YES' ? person.phone :
@@ -70,7 +80,7 @@ const resolvers = {
 
 					args.phone === 'YES' ? person.phone :
 					!person.phone;
-			return personsFromRestApi.filter(byPhone);
+			return persons.filter(byPhone);
 		},
 		findPerson  : (root, args) => {
 			const { name } = args;
@@ -86,7 +96,7 @@ const resolvers = {
 			}
 
 			// const {name, phone, street, city} = args
-			const person = { ...args, id: uuid };
+			const person = { ...args, id: uuid() };
 			persons.push(person); //update database whith new person
 			return person;
 		},
